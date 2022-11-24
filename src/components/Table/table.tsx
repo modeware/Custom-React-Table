@@ -8,7 +8,7 @@ enum Direction {
     ORIGINAL//2
 }
    
-const Table: FC<ITableProps> = ({tableData, sortBy}) => {
+const Table: FC<ITableProps> = ({tableData, sortBy, actionHandlers}) => {
     let [currentSortingOrder, setSortingOrder] = useState(Direction.ORIGINAL)
     let {headers, rows} = tableData;
     let [tableRows, setTableRows] = useState(rows || [])
@@ -62,6 +62,21 @@ const Table: FC<ITableProps> = ({tableData, sortBy}) => {
         }       
     }
 
+    const handler = (e: any, key: any, columnIdentifier: any, row: any) => {
+        console.log(columnIdentifier, tableRows)
+        if(actionHandlers){
+            let keys = Object.keys(actionHandlers)
+            for(let k of keys){               
+                if(columnIdentifier === k){
+                let filteredData =  actionHandlers[k].handler(e, key, tableRows, row.id)
+                setTableRows(filteredData)
+                console.log(columnIdentifier, filteredData)
+                }
+            }
+        }
+        return;
+    }
+
     return (
         <table>
             <thead>
@@ -71,7 +86,7 @@ const Table: FC<ITableProps> = ({tableData, sortBy}) => {
                         render headers
                     */
                 headers.map((header: any, index)=>{
-                     return <th key={index} onClick={()=>sortRows(header.title)}>{header.title}</th>          
+                     return <th key={index}><span onClick={()=>sortRows(header.title)}>{header.title}</span></th>          
                 })}
             </tr>
             </thead>
@@ -84,7 +99,9 @@ const Table: FC<ITableProps> = ({tableData, sortBy}) => {
                         /*render cells*/
                         headers.map((header: any, index)=>{
                             return (<td key={index}>
-                                        {row[header.title]}       
+                                        <div onClick={(e)=>{handler(e, 'id', header.title, row)}}>
+                                            {row[header.title]}
+                                        </div>     
                                     </td>)
                             })
                         
