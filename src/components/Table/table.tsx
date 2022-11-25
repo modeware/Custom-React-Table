@@ -2,6 +2,7 @@ import { FC, useState } from "react";
 import { ITableProps } from './tablePropsInterface';
 import './table.css'
 import TableHead from "./TableHead/tableHead";
+import { isSortable } from './utils/isSortable';
 
 enum Direction {
     ASCENDING, //0
@@ -12,7 +13,7 @@ enum Direction {
 const Table: FC<ITableProps> = ({tableData, sortBy, actionHandlers}) => {
     let [currentSortingOrder, setSortingOrder] = useState(Direction.ORIGINAL)
     let {headers, rows} = tableData;
-    let [orderBy, setOrderBy] = useState('');
+    let [orderBy, setOrderBy] = useState('id');
     let [tableRows, setTableRows] = useState(rows || [])
 
     const getSortValues = (a : any, b: any, key: any) => {
@@ -49,9 +50,10 @@ const Table: FC<ITableProps> = ({tableData, sortBy, actionHandlers}) => {
 
     const sortRows = (key: string)=>{
         setOrderBy(key)
-        if(!(sortBy.includes(key))){
-            return
+        if(!isSortable(key, sortBy)){
+            return;
         }
+       
         let sortedData = tableRows.sort((a: any, b: any)=>{
             return getSortValues(a, b, key);               
         })
@@ -84,10 +86,11 @@ const Table: FC<ITableProps> = ({tableData, sortBy, actionHandlers}) => {
         <table>
            <TableHead 
                 headers={headers} 
-                labelIcon={"somethimg"} 
+                showIcon={true}
                 sortRows={sortRows} 
                 orderByKey={orderBy}
                 orderByDirection={currentSortingOrder}
+                sortBy={sortBy}
                 />
            <tbody> 
         {tableRows.map((row: any, index)=>{
@@ -98,8 +101,8 @@ const Table: FC<ITableProps> = ({tableData, sortBy, actionHandlers}) => {
                         /*render cells*/
                         headers.map((header: any, index)=>{
                             return (<td key={index}>
-                                        <div onClick={(e)=>{handler(e, 'id', header.title, row)}}>
-                                            {row[header.title]}
+                                        <div>
+                                            {<span onClick={(e)=>{handler(e, 'id', header.title, row)}}>{row[header.title]}</span>}
                                         </div>     
                                     </td>)
                             })

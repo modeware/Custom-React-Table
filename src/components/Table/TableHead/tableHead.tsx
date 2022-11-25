@@ -1,29 +1,40 @@
 import { FC } from "react";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from 'react-icons/ai';
+import { isSortable } from './../utils/isSortable';
 
 
 
 interface IThead{
     headers: Array<any>
     sortRows: (any: any, ...args: any)=>any
-    labelIcon?: any
+    showIcon?: boolean
     orderByKey?: string
     orderByDirection?: number
+    sortBy?: Array<string>
 }
 
-const HeaderLabel: FC<any> = ({headerTitle, icon, activeHeader, direction, ...props}) => {
+const HeaderLabel: FC<any> = ({headerTitle, showIcon, activeHeader, direction, sortBy, ...props}) => {
     return (
-        <div className="header-cell" {...props}>
-                <span>{headerTitle}</span>
-                <span className={`${headerTitle === activeHeader? 'is-active': 'is-not-active'}`}>
-                    {(icon ? direction === 1 ? <AiOutlineArrowDown/> : <AiOutlineArrowUp/>  : null)}
-                </span>
+        <div {...props}>
+                <span className="header-cell">{headerTitle}</span>
+                
+                {
+                isSortable(headerTitle, sortBy)? 
+                <span className="header-cell">
+               
+                    <span className={`${headerTitle === activeHeader? 'is-active': 'is-not-active'}`}>
+                        {(showIcon ? direction === 1 ? <AiOutlineArrowDown/> : <AiOutlineArrowUp/>  : null)}
+                    </span>
+                                
+                </span>: null
+                }
+                
 
         </div>
     )
 }
 
-const TableHead: FC<IThead>= ({headers, sortRows, labelIcon, orderByKey, orderByDirection}) => {
+const TableHead: FC<IThead>= ({headers, sortRows, showIcon, orderByKey, orderByDirection, ...props}) => {
     return (<thead>
         <tr>
         {headers.map((header)=>{
@@ -33,7 +44,8 @@ const TableHead: FC<IThead>= ({headers, sortRows, labelIcon, orderByKey, orderBy
                                 onClick={()=>sortRows(header.title)}
                                 direction={orderByDirection}
                                 activeHeader={orderByKey} 
-                                icon={labelIcon}
+                                showIcon={showIcon}
+                               {...props}
                             />
                         </th>          
         })}
