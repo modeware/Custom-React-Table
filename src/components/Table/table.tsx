@@ -1,6 +1,7 @@
 import { FC, useState } from "react";
 import { ITableProps } from './tablePropsInterface';
 import './table.css'
+import TableHead from "./TableHead/tableHead";
 
 enum Direction {
     ASCENDING, //0
@@ -11,6 +12,7 @@ enum Direction {
 const Table: FC<ITableProps> = ({tableData, sortBy, actionHandlers}) => {
     let [currentSortingOrder, setSortingOrder] = useState(Direction.ORIGINAL)
     let {headers, rows} = tableData;
+    let [orderBy, setOrderBy] = useState('');
     let [tableRows, setTableRows] = useState(rows || [])
 
     const getSortValues = (a : any, b: any, key: any) => {
@@ -46,6 +48,7 @@ const Table: FC<ITableProps> = ({tableData, sortBy, actionHandlers}) => {
 }
 
     const sortRows = (key: string)=>{
+        setOrderBy(key)
         if(!(sortBy.includes(key))){
             return
         }
@@ -60,10 +63,10 @@ const Table: FC<ITableProps> = ({tableData, sortBy, actionHandlers}) => {
             setTableRows(sortedData)
             setSortingOrder(Direction.ASCENDING)
         }       
+    
     }
 
     const handler = (e: any, key: any, columnIdentifier: any, row: any) => {
-        console.log(columnIdentifier, tableRows)
         if(actionHandlers){
             let keys = Object.keys(actionHandlers)
             for(let k of keys){               
@@ -79,17 +82,13 @@ const Table: FC<ITableProps> = ({tableData, sortBy, actionHandlers}) => {
 
     return (
         <table>
-            <thead>
-            <tr>
-                {
-                    /*
-                        render headers
-                    */
-                headers.map((header: any, index)=>{
-                     return <th key={index}><span onClick={()=>sortRows(header.title)}>{header.title}</span></th>          
-                })}
-            </tr>
-            </thead>
+           <TableHead 
+                headers={headers} 
+                labelIcon={"somethimg"} 
+                sortRows={sortRows} 
+                orderByKey={orderBy}
+                orderByDirection={currentSortingOrder}
+                />
            <tbody> 
         {tableRows.map((row: any, index)=>{
             return (

@@ -8,4 +8,17 @@ table {
 
 th,td{
     padding: 0.5rem;
+    cursor: pointer;
+}
+
+.is-active{
+    visibility: visible;
+}
+.is-not-active{
+    visibility: hidden;
+}
+
+.header-cell:hover .is-not-active{
+    visibility: visible;
+    opacity: 0.2;
 }
